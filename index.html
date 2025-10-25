@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<!-- MODIFIED: Removed 'dark' class, JS will add it -->
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dot-to-Dot Creator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- NEW: Google API for YouTube button -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <style>
         /* Custom styles for a better look */
-        /* MODIFIED: Used unique class .d2d-body */
         .d2d-body {
             font-family: 'Inter', sans-serif;
         }
-        /* MODIFIED: Used unique class .d2d-canvas */
         .d2d-canvas {
-            cursor: crosshair;
             background-color: #ffffff;
             /* Ensure canvas doesn't shrink smaller than its set size */
             min-width: var(--canvas-width, auto);
@@ -28,21 +28,25 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* Style for the eraser cursor */
-        .eraser-cursor {
-            cursor: none; /* Hide default cursor */
-        }
-        /* Styles for Pan Tool */
-        .pan-cursor {
-            cursor: grab;
-        }
-        .panning-cursor {
-            cursor: grabbing;
-        }
-        /* Ensure the container itself can scroll */
+        /* Cursors */
+        .eraser-cursor { cursor: none; }
+        .pan-cursor { cursor: grab; }
+        .panning-cursor { cursor: grabbing; }
+        .eyedropper-cursor { cursor: crosshair; } /* Can be more specific later */
+        
         #canvas-container {
             max-width: 100%;
-            max-height: 85vh; /* Increased from 80vh to 85vh */
+            max-height: 85vh;
+        }
+        /* Styles for Dark Mode Toggle */
+        .dot {
+            transition: transform 0.2s ease-in-out;
+        }
+        input:checked ~ .dot {
+            transform: translateX(1.75rem); /* 28px */
+        }
+        input:checked ~ .block {
+            background-color: #3b82f6; /* blue-600 */
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -53,19 +57,47 @@
         }
     </script>
 </head>
-<!-- MODIFIED: Added .d2d-body class, REMOVED p-4 -->
+<!-- MODIFIED: Restored dark mode classes -->
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center d2d-body">
 
-    <!-- Removed max-w-7xl to allow full width, REMOVED px-4 lg:px-8 -->
-    <div class="w-full mx-auto">
-        
-        <!-- REMOVED Header Block -->
+    <!-- NEW: Navigation Bar -->
+    <nav class="w-full bg-white dark:bg-gray-800 shadow-md">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14">
+                <div class="flex items-center space-x-4">
+                    <!-- NEW: Blog Link -->
+                    <a href="https://khalidfer.com" target="_blank" rel="noopener noreferrer" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium">Blog</a>
+                    <!-- NEW: Share Button -->
+                    <button id="shareButton" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium">Share</button>
+                    <button id="aboutButton" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium">About</button>
+                    <button id="contactButton" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium">Contact</button>
+                </div>
+                
+                <!-- Dark Mode Toggle -->
+                <label for="darkModeToggle" class="flex items-center cursor-pointer">
+                    <!-- Sun icon -->
+                    <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 12a5 5 0 100-10 5 5 0 000 10z"></path></svg>
+                    <div class="relative mx-2">
+                        <input type="checkbox" id="darkModeToggle" class="sr-only">
+                        <div class="block bg-gray-600 w-14 h-8 rounded-full block"></div>
+                        <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full dot"></div>
+                    </div>
+                    <!-- Moon icon -->
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <!-- MODIFIED: Added max-w-7xl and padding for "compact" layout -->
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- MODIFIED: Switched to CSS Grid, changed lg: to md: -->
         <main class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
 
             
-            <!-- MODIFIED: Switched to md:col-span-1 -->
+            <!-- MODIFIED: Restored dark mode classes -->
             <aside class="w-full md:col-span-1 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4 border-b border-gray-300 dark:border-gray-600 pb-2">Controls</h2>
                 
@@ -93,12 +125,12 @@
                 
                 <div class="mb-4">
                     <span class="block text-sm font-medium mb-2">3. Select Tool</span>
-                    <div class="grid grid-cols-2 gap-2">
+                    <!-- MODIFIED: Grid cols 3 for new tool -->
+                    <div class="grid grid-cols-3 gap-2">
                         
                         <div>
                             <input type="radio" name="tool" id="tool-add" value="add" class="sr-only tool-radio" checked disabled>
                             <label for="tool-add" class="flex flex-col items-center justify-center p-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer text-center text-sm font-medium transition-colors">
-                                
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -125,7 +157,7 @@
                                 Erase Dots
                             </label>
                         </div>
-                        <!-- NEW Pan Tool Button - CORRECTED SVG -->
+                        
                         <div>
                             <input type="radio" name="tool" id="tool-pan" value="pan" class="sr-only tool-radio" disabled>
                             <label for="tool-pan" class="flex flex-col items-center justify-center p-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer text-center text-sm font-medium transition-colors">
@@ -133,6 +165,17 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 11.5l5 5 5-5m-10-2l5-5 5 5" />
                                 </svg>
                                 Pan
+                            </label>
+                        </div>
+
+                        <!-- NEW Eyedropper Tool Button -->
+                        <div>
+                            <input type="radio" name="tool" id="tool-eyedropper" value="eyedropper" class="sr-only tool-radio" disabled>
+                            <label for="tool-eyedropper" class="flex flex-col items-center justify-center p-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer text-center text-sm font-medium transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 17.5c-.266 0-.52-.105-.707-.293l-4.243-4.243a1 1 0 010-1.414l7.07-7.071a1 1 0 011.414 0l4.243 4.243a1 1 0 010 1.414l-7.071 7.07a1 1 0 01-.707.293zM10.5 6.5l-5 5L9 15l5-5-3.5-3.5zM15 12l-1.5 1.5 5 5L22 15l-5-5-2 2z" />
+                                </svg>
+                                Pick Color
                             </label>
                         </div>
                     </div>
@@ -211,9 +254,11 @@
 
                 
                 <div class="space-y-2">
-                    <button id="undoButton" class="w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow transition-colors disabled:opacity-50" disabled>Undo Last Dot</button>
+                    <button id="undoButton" class="w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow transition-colors disabled:opacity-50" disabled>Undo Last Dot (Ctrl+Z)</button>
                     <button id="clearButton" class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors disabled:opacity-50" disabled>Clear All (This Image)</button>
                     <button id="toggleImageButton" class="w-full py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors disabled:opacity-50" disabled>Toggle Image</button>
+                    <!-- NEW Toggle Numbers Button -->
+                    <button id="toggleNumbersButton" class="w-full py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-colors disabled:opacity-50" disabled>Hide Numbers</button>
                 </div>
 
                 
@@ -221,7 +266,6 @@
                     <button id="downloadButton" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition-colors disabled:opacity-50" disabled>
                         Download as PNG
                     </button>
-                    <!-- NEW "Download All" Button -->
                     <button id="downloadAllButton" class="w-full mt-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition-colors disabled:opacity-50" disabled>
                         Download All as PNGs
                     </button>
@@ -230,11 +274,8 @@
             </aside>
 
             
-            <!-- MODIFIED: Switched to md:col-span-3 -->
             <div class="w-full md:col-span-3">
-                <!-- MODIFIED: Removed lg:h-auto lg:aspect-video -->
                 <div id="canvas-container" class="relative w-full h-[70vh] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-auto flex items-center justify-center">
-                    <!-- MODIFIED: Added .d2d-canvas class -->
                     <canvas id="dotCanvas" class="d2d-canvas"></canvas>
                     <div id="eraser-preview" class="absolute rounded-full border-2 border-red-500 pointer-events-none hidden" style="mix-blend-mode: difference;"></div>
                     <div id="placeholder-text" class="absolute text-gray-400 dark:text-gray-500 text-center p-8">
@@ -251,6 +292,7 @@
     </div>
 
     
+    <!-- Confirm Modal -->
     <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full">
             <h3 id="modalTitle" class="text-lg font-semibold mb-4">Confirm Action</h3>
@@ -265,6 +307,66 @@
             </div>
         </div>
     </div>
+
+    <!-- NEW: Info Modal (for About/Contact) -->
+    <div id="infoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-lg w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="infoModalTitle" class="text-lg font-semibold"></h3>
+                <button id="infoModalClose" class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="infoModalContent" class="text-sm text-gray-700 dark:text-gray-300 space-y-4 max-h-[60vh] overflow-y-auto">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Share Modal (Pro Version) -->
+    <div id="shareModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Share This Tool</h3>
+                <button id="shareModalClose" class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Share this tool with your friends!</p>
+            
+            <!-- Social Share Buttons -->
+            <div class="flex justify-center space-x-4 mb-6">
+                <!-- X (Twitter) -->
+                <button id="shareTwitterButton" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-6 h-6 text-[#1DA1F2]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </button>
+                <!-- Facebook -->
+                <button id="shareFacebookButton" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-6 h-6 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                </button>
+                <!-- WhatsApp -->
+                <button id="shareWhatsappButton" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-6 h-6 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2.02c-5.52 0-9.99 4.47-9.99 9.99 0 1.77.46 3.45 1.26 4.96l-1.26 4.59 4.7-1.23c1.47.74 3.09 1.15 4.81 1.15h.01c5.52 0 9.99-4.47 9.99-9.99s-4.47-9.99-9.99-9.99zM12.04 20.1c-1.54 0-3.02-.38-4.34-1.07l-.31-.18-3.23.84.86-3.14-.2-.33c-.76-1.37-1.17-2.92-1.17-4.57 0-4.48 3.63-8.12 8.12-8.12 2.19 0 4.23.86 5.74 2.37 1.51 1.51 2.37 3.55 2.37 5.74-.01 4.49-3.64 8.12-8.11 8.12zm4.52-6.14c-.25-.12-1.47-.72-1.7-.8s-.39-.12-.56.12c-.17.25-.64.8-.79.96-.15.17-.29.19-.54.06-.25-.12-1.06-.39-2.02-1.24-.75-.66-1.25-1.48-1.4-1.73-.15-.25-.02-.38.11-.5.12-.11.25-.29.38-.43.12-.15.17-.25.25-.41.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.41-.42-.56-.42h-.5c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.88 2.4 1 2.56.12.17 1.76 2.68 4.27 3.78 1.76.77 2.12.91 2.8.85.83-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.07-.12-.24-.19-.49-.31z"/></svg>
+                </button>
+                <!-- LinkedIn -->
+                <button id="shareLinkedinButton" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-6 h-6 text-[#0A66C2]" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </button>
+                <!-- Email -->
+                <button id="shareEmailButton" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+                </button>
+            </div>
+            
+            <!-- Copy Link Input -->
+            <div class="flex space-x-2">
+                <input type="text" readonly id="shareLinkInput" class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+                <button id="copyLinkButton" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-colors">Copy</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -294,8 +396,9 @@
             const undoButton = document.getElementById('undoButton');
             const clearButton = document.getElementById('clearButton');
             const toggleImageButton = document.getElementById('toggleImageButton');
+            const toggleNumbersButton = document.getElementById('toggleNumbersButton'); // NEW
             const downloadButton = document.getElementById('downloadButton');
-            const downloadAllButton = document.getElementById('downloadAllButton'); // Get the new button
+            const downloadAllButton = document.getElementById('downloadAllButton'); 
             
             // Zoom Controls
             const zoomInButton = document.getElementById('zoomInButton');
@@ -308,21 +411,46 @@
             const placeholderText = document.getElementById('placeholder-text');
             const eraserPreview = document.getElementById('eraser-preview');
 
-            // Modal Elements
+            // Confirm Modal Elements
             const confirmModal = document.getElementById('confirmModal');
             const modalMessage = document.getElementById('modalMessage');
             const modalCancel = document.getElementById('modalCancel');
             const modalConfirm = document.getElementById('modalConfirm');
             const modalTitle = document.getElementById('modalTitle');
 
+            // Info Modal Elements
+            const infoModal = document.getElementById('infoModal');
+            const infoModalTitle = document.getElementById('infoModalTitle');
+            const infoModalContent = document.getElementById('infoModalContent');
+            const infoModalClose = document.getElementById('infoModalClose');
+            const aboutButton = document.getElementById('aboutButton');
+            const contactButton = document.getElementById('contactButton');
+
+            // Share Modal Elements
+            const shareModal = document.getElementById('shareModal');
+            const shareButton = document.getElementById('shareButton');
+            const shareModalClose = document.getElementById('shareModalClose');
+            const copyLinkButton = document.getElementById('copyLinkButton');
+            const shareLinkInput = document.getElementById('shareLinkInput'); // Get input field
+            const shareTwitterButton = document.getElementById('shareTwitterButton');
+            const shareFacebookButton = document.getElementById('shareFacebookButton');
+            const shareWhatsappButton = document.getElementById('shareWhatsappButton');
+            const shareLinkedinButton = document.getElementById('shareLinkedinButton');
+            const shareEmailButton = document.getElementById('shareEmailButton');
+
+
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+
             // State
-            let allDots = []; // Array of arrays: [[...img1dots], [...img2dots]]
-            let originalBackgroundImages = []; // Array of Image objects
-            let currentBackgroundImages = []; // Array of Canvas elements (for erasing)
-            let activeImageIndex = -1; // Index for the currently active image
+            let allDots = []; 
+            let originalBackgroundImages = []; 
+            let currentBackgroundImages = []; 
+            let activeImageIndex = -1; 
 
             let showImage = true;
-            let currentTool = 'add'; // Default tool
+            let showNumbers = true; // NEW
+            let currentTool = 'add'; 
             let dotSize = parseInt(dotSizeSlider.value, 10);
             let lineWidth = parseInt(lineWidthSlider.value, 10);
             let fontSize = parseInt(fontSizeSlider.value, 10);
@@ -331,20 +459,216 @@
             let dotColor = dotColorPicker.value;
             let lineColor = lineColorPicker.value;
             let dotSpacing = parseInt(spacingSlider.value, 10);
-            let isDrawing = false; // For continuous erasing
-            // NEW Pan State
+            let isDrawing = false; 
             let isPanning = false;
             let lastPanX = 0;
             let lastPanY = 0;
 
-            // Zoom State
             let zoomLevel = 1.0;
             const minZoom = 0.2;
             const maxZoom = 5.0;
-            const zoomStep = 0.1;
+
+            // --- Dark Mode Logic ---
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    darkModeToggle.checked = true;
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    darkModeToggle.checked = false;
+                }
+            }
+
+            darkModeToggle.addEventListener('change', (e) => {
+                const theme = e.target.checked ? 'dark' : 'light';
+                localStorage.setItem('theme', theme);
+                applyTheme(theme);
+            });
+
+            // Apply theme on load
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (systemPrefersDark) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+            // --- End Dark Mode Logic ---
+
+            // --- Info Modal Logic ---
+            const aboutContent = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-100 mb-2">About This Tool</h4>
+                        <p>Welcome to the Dot-to-Dot Creator! This professional tool is designed to make creating connect-the-dots puzzles from your images simple and intuitive. Whether you're a blogger looking for engaging content, an educator creating learning materials, or just someone looking for a fun creative outlet, this tool has you covered.</p>
+                        <p class="mt-2">It's built with modern web technologies and optimized for easy embedding directly into your blog or website, providing a seamless experience for your visitors.</p>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-2">Key Features:</h5>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li><b>Multi-Image Support:</b> Effortlessly manage and edit multiple dot-to-dot puzzles in one session.</li>
+                            <li><b>Comprehensive Tools:</b> Precisely add dots, erase image sections or just the dots, pan across large images with the hand tool, and instantly pick colors from your image using the eyedropper.</li>
+                            <li><b>Precision & Control:</b> Fine-tune your work with zoom-to-cursor functionality, optional fixed dot spacing for uniform layouts, and individually adjustable erase radii.</li>
+                            <li><b>Full Customization:</b> Tailor the appearance of your puzzle by adjusting dot size, connecting line width, number size, and colors for both dots and lines.</li>
+                            <li><b>Clean Output Options:</b> Toggle the visibility of the background image and dot numbers to create different styles or answer keys.</li>
+                            <li><b>Batch Export:</b> Download all your created puzzles as high-quality PNG images individually or all at once.</li>
+                            <li><b>Keyboard Shortcuts:</b> Use Ctrl+Z (or Cmd+Z) for quick undo actions.</li>
+                            <li><b>Dark Mode:</b> Switch between light and dark themes for comfortable viewing.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-100 mt-6 mb-2">About the Developer</h4>
+                        <p>This tool was developed by Khalid Fer, a passionate web developer dedicated to creating high-quality, user-friendly tools. Khalid focuses on building practical applications that enhance creativity and productivity on the web.</p>
+                        <p class="mt-2">If you find this tool useful, consider checking out Khalid's <a href="https://khalidfer.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">blog</a> or connecting via the social media links in the Contact section!</p>
+                    </div>
+                </div>
+            `;
+            
+            const contactContent = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-100 mb-2">Get in Touch</h4>
+                        <p>For any questions, feedback, or inquiries, please feel free to reach out:</p>
+                        <a href="mailto:dev.khalidfer@gmail.com" class="text-blue-600 dark:text-blue-400 hover:underline">dev.khalidfer@gmail.com</a>
+                        <p class="mt-2">Or visit my blog:</p>
+                        <a href="https://khalidfer.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">khalidfer.com</a>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">Subscribe to my Channel</h5>
+                        <!-- YouTube Subscribe Button -->
+                        <div class="g-ytsubscribe" data-channelid="UCARajj-TJdBNT66CjbkZJdQ" data-layout="full" data-count="default"></div>
+                    </div>
+
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h5 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">Follow Me</h5>
+                        <div class="flex flex-wrap gap-4">
+                            <!-- X (Twitter) -->
+                            <a href="https://x.com/KhalidFer" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="X (Twitter)">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            </a>
+                            <!-- Facebook -->
+                            <a href="https://web.facebook.com/Khalidfer0/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Facebook">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                            </a>
+                            <!-- Instagram -->
+                            <a href="https://www.instagram.com/khalidferchach" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Instagram">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.172.053 1.905.24 2.583.497.67.25 1.21.58 1.74.98.54.41.87.95.98 1.74.26.68.45 1.41.5 2.58.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.24 1.9-.5 2.58-.25.67-.58 1.21-.98 1.74-.41.54-.95.87-1.74.98-.68.26-1.41.45-2.58.5-.1.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.9-.24-2.58-.5-.67-.25-1.21-.58-1.74-.98-.54-.41-.87-.95-.98-1.74-.26-.68-.45-1.41-.5-2.58-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.24-1.9.5-2.58.25-.67.58-1.21.98-1.74.41-.54.95-.87 1.74.98.68-.26 1.41-.45 2.58-.5C8.417 2.175 8.796 2.163 12 2.163zm0 1.802c-3.14 0-3.48.01-4.7.07-1.07.05-1.7.22-2.2.42-.5.18-1.01.45-1.48.9-.47.47-.73.99-.9 1.48-.2.5-.37 1.13-.42 2.2-.06 1.22-.07 1.56-.07 4.7s.01 3.48.07 4.7c.05 1.07.22 1.7.42 2.2.18.5.45 1.01.9 1.48.47.47.99.73 1.48.9.5.2 1.13.37 2.2.42 1.22.06 1.56.07 4.7.07 3.14 0 3.48-.01 4.7-.07 1.07-.05 1.7-.22 2.2-.42.5-.18 1.01-.45 1.48-.9.47-.47.73-.99.9-1.48.2-.5.37-1.13.42-2.2.06-1.22.07-1.56.07-4.7s-.01-3.48-.07-4.7c-.05-1.07-.22-1.7-.42-2.2-.18-.5-.45-1.01-.9-1.48-.47-.47-.99-.73-1.48-.9-.5-.2-1.13-.37-2.2-.42C15.48 3.975 15.14 3.965 12 3.965zM12 9.75a6.25 6.25 0 100 12.5 6.25 6.25 0 000-12.5zm0 10.5c-2.34 0-4.25-1.91-4.25-4.25S9.66 7.5 12 7.5s4.25 1.91 4.25 4.25-1.91 4.25-4.25 4.25zM18.88 7.002a1.44 1.44 0 100-2.88 1.44 1.44 0 000 2.88z"/></svg>
+                            </a>
+                            <!-- TikTok -->
+                            <a href="https://www.tiktok.com/@khalidfer" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="TikTok">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.05-4.84-.6-6.6-2.31-2.24-2.14-3.3-5-3.06-7.78.2-2.12 1.13-4.1 2.6-5.71 1.14-1.24 2.6-2.16 4.19-2.65.66-.21 1.32-.4 1.98-.51 1.21-.21 2.44-.3 3.65-.21h.01zM12 4.88c-1.11.02-2.21.31-3.22.92-1.27.76-2.3 1.9-2.94 3.21-.11.23-.19.46-.26.71-.48 1.83.19 3.8.99 5.37.79 1.56 2.08 2.8 3.65 3.5.7.31 1.45.52 2.2.62 1.3.17 2.62.1 3.9-.12.16-.02.32-.05.48-.07.41-.06.82-.13 1.23-.23.95-.23 1.86-.6 2.69-1.14.9-.6 1.6-1.43 2.07-2.39.23-.46.4-.95.54-1.46.12-.41.21-.83.27-1.25.07-.46.1-1.01.07-1.55-.02-.38-.06-.76-.12-1.14-.13-1.05-.44-2.07-.94-3.02-.6-1.12-1.44-2.08-2.47-2.8-.95-.67-2.03-1.13-3.15-1.35-.42-.08-.85-.13-1.28-.16-.36-.02-.71-.04-1.07-.04z"/></svg>
+                            </a>
+                            <!-- Telegram -->
+                            <a href="https://t.me/+HazrwuUe9EExNGQ0" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400" title="Telegram">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0011.944 0zM17.062 7.472c-.173.753-.618 2.626-1.07 4.966-.44 2.278-.89 4.54-1.01 4.965-.116.42-.328.525-.525.53-.306.01-.525-.116-.753-.233-1.01-.525-1.59-1.01-2.58-1.59-.99-.58-1.74-.29-2.73.524-.753.618-1.16 1.103-1.74 1.59-.752.618-1.336.524-1.59.232-.306-.35-.618-1.39-.99-3.223-.525-2.522-1.01-4.84-1.07-5.188-.06-1.047.525-1.59 1.447-1.59h6.183c.92 0 1.335.29 1.22.93z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            aboutButton.addEventListener('click', () => {
+                infoModalTitle.textContent = "About This Tool";
+                infoModalContent.innerHTML = aboutContent;
+                infoModal.classList.remove('hidden');
+                // Re-render YouTube button if it's in the modal
+                if (window.gapi && window.gapi.ytsubscribe) {
+                    window.gapi.ytsubscribe.go();
+                }
+            });
+
+            contactButton.addEventListener('click', () => {
+                infoModalTitle.textContent = "Contact & Socials";
+                infoModalContent.innerHTML = contactContent;
+                infoModal.classList.remove('hidden');
+                // Re-render YouTube button if it's in the modal
+                if (window.gapi && window.gapi.ytsubscribe) {
+                    window.gapi.ytsubscribe.go();
+                }
+            });
+
+            infoModalClose.addEventListener('click', () => {
+                infoModal.classList.add('hidden');
+            });
+
+            infoModal.addEventListener('click', (e) => {
+                if (e.target === infoModal) {
+                    infoModal.classList.add('hidden');
+                }
+            });
+            // --- End Info Modal Logic ---
+
+            // --- Share Modal Logic ---
+            const shareURL = 'https://khalidfer.com';
+            const shareTitle = 'Check out this awesome Dot-to-Dot Creator Tool!';
+            shareLinkInput.value = shareURL;
+
+            shareButton.addEventListener('click', () => {
+                shareModal.classList.remove('hidden');
+            });
+            shareModalClose.addEventListener('click', () => {
+                shareModal.classList.add('hidden');
+            });
+            shareModal.addEventListener('click', (e) => {
+                if (e.target === shareModal) {
+                    shareModal.classList.add('hidden');
+                }
+            });
+            copyLinkButton.addEventListener('click', () => {
+                const textToCopy = shareLinkInput.value;
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                textArea.style.position = 'fixed';  // Ensure it's not visible
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyLinkButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyLinkButton.textContent = 'Copy Link';
+                    }, 1500);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            });
+
+            shareTwitterButton.addEventListener('click', () => {
+                const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareURL)}&text=${encodeURIComponent(shareTitle)}`;
+                window.open(url, '_blank');
+            });
+
+            shareFacebookButton.addEventListener('click', () => {
+                const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareURL)}`;
+                window.open(url, '_blank');
+            });
+
+            shareWhatsappButton.addEventListener('click', () => {
+                const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareURL)}`;
+                window.open(url, '_blank');
+            });
+
+            shareLinkedinButton.addEventListener('click', () => {
+                const url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareURL)}&title=${encodeURIComponent(shareTitle)}`;
+                window.open(url, '_blank');
+            });
+
+            shareEmailButton.addEventListener('click', () => {
+                const url = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent('Check it out: ' + shareURL)}`;
+                window.location.href = url;
+            });
+            // --- End Share Modal Logic ---
+
 
             // --- Helper Functions ---
-
             function getMousePos(evt) {
                 const rect = canvas.getBoundingClientRect();
                 const scaleX = canvas.width / rect.width;
@@ -355,57 +679,45 @@
                 };
             }
 
-            // Switches the active image on the canvas
             function switchToImage(index) {
                 if (index < 0 || index >= originalBackgroundImages.length) {
-                    // Handle case where all images might have been removed or no images loaded
                     activeImageIndex = -1;
                     imageSelector.value = '';
-                    canvas.width = 0; // Clear canvas size
+                    canvas.width = 0; 
                     canvas.height = 0;
                     placeholderText.classList.remove('hidden');
-                    disableControls(); // Disable controls if no image
-                    draw(); // Clear display
+                    disableControls(); 
+                    draw(); 
                     return;
                 }
 
                 activeImageIndex = index;
                 imageSelector.value = index;
-
                 const activeImage = originalBackgroundImages[activeImageIndex];
-                
-                // Set canvas physical dimensions
                 canvas.width = activeImage.width;
                 canvas.height = activeImage.height;
-                
-                // Reset zoom and apply it (which sets style width/height)
                 zoomLevel = 1.0;
                 updateZoom();
-
-                enableControls(); // Re-enable controls as an image is now active
+                enableControls(); 
                 draw();
             }
 
             function draw() {
                 if (activeImageIndex === -1) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Ensure canvas is clear if no image
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
                     return;
                 }
 
                 const activeBg = currentBackgroundImages[activeImageIndex];
                 const activeDots = allDots[activeImageIndex];
-                
-                if (!activeBg) return; // Exit if background isn't ready
+                if (!activeBg) return; 
 
-                // Clear canvas fully to redraw everything
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw background image if applicable
                 if (showImage && activeBg) {
                     ctx.drawImage(activeBg, 0, 0);
                 }
 
-                // Draw lines
                 if (lineWidth > 0 && activeDots.length > 1) {
                     ctx.beginPath();
                     ctx.moveTo(activeDots[0].x, activeDots[0].y);
@@ -417,63 +729,59 @@
                     ctx.stroke();
                 }
 
-                // Draw dots and numbers
-                ctx.font = `${fontSize}px Arial`;
-                // ctx.textAlign = 'center'; // No longer default center
-                ctx.textBaseline = 'middle';
+                // NEW: Check showNumbers state
+                if (showNumbers) {
+                    ctx.font = `${fontSize}px Arial`;
+                    ctx.textBaseline = 'middle';
+                    activeDots.forEach(dot => {
+                        // Draw dot
+                        ctx.beginPath();
+                        ctx.arc(dot.x, dot.y, dotSize, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#FFFFFF'; 
+                        ctx.fill();
+                        ctx.strokeStyle = dotColor; 
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
 
-                activeDots.forEach(dot => {
-                    // Draw dot
-                    ctx.beginPath();
-                    ctx.arc(dot.x, dot.y, dotSize, 0, 2 * Math.PI);
-                    ctx.fillStyle = '#FFFFFF'; // Always fill dot with white
-                    ctx.fill();
-                    ctx.strokeStyle = dotColor; // Use selected dot color for outline
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-
-                    // Draw number
-                    ctx.fillStyle = dotColor; // Use selected dot color for number
-                    ctx.textAlign = 'right'; // Align text to the right
-                    // Offset number to the left of the dot
-                    ctx.fillText(dot.number, dot.x - dotSize - 5, dot.y); // 5px gap
-                });
+                        // Draw number
+                        ctx.fillStyle = dotColor; 
+                        ctx.textAlign = 'right'; 
+                        ctx.fillText(dot.number, dot.x - dotSize - 5, dot.y);
+                    });
+                } else {
+                    // Still draw dots, just no numbers
+                    activeDots.forEach(dot => {
+                        ctx.beginPath();
+                        ctx.arc(dot.x, dot.y, dotSize, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#FFFFFF'; 
+                        ctx.fill();
+                        ctx.strokeStyle = dotColor; 
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    });
+                }
             }
 
             function updateZoom() {
                 if (activeImageIndex === -1 || !originalBackgroundImages[activeImageIndex]) {
-                     // No active image, reset zoom display
                     zoomLevel = 1.0;
                     zoomLevelDisplay.textContent = '100%';
                     canvas.style.width = 'auto';
                     canvas.style.height = 'auto';
-                    // CSS variables for min-width/height
                     canvas.style.setProperty('--canvas-width', 'auto');
                     canvas.style.setProperty('--canvas-height', 'auto');
                     return;
                 }
 
                 const activeImg = originalBackgroundImages[activeImageIndex];
-
-                // Clamp zoom level
                 zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
-                
-                // Update display
                 zoomLevelDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
-
                 const displayWidth = activeImg.width * zoomLevel;
                 const displayHeight = activeImg.height * zoomLevel;
-
-                // Update canvas display size
                 canvas.style.width = `${displayWidth}px`;
                 canvas.style.height = `${displayHeight}px`;
-
-                // Update CSS variables for min-width/height
                 canvas.style.setProperty('--canvas-width', `${displayWidth}px`);
                 canvas.style.setProperty('--canvas-height', `${displayHeight}px`);
-
-                
-                // Update button states
                 zoomInButton.disabled = zoomLevel >= maxZoom;
                 zoomOutButton.disabled = zoomLevel <= minZoom;
                 zoomResetButton.disabled = zoomLevel === 1.0;
@@ -483,8 +791,9 @@
                 placeholderText.classList.add('hidden');
                 toolRadios.forEach(radio => radio.disabled = false);
                 toggleImageButton.disabled = false;
+                toggleNumbersButton.disabled = false; // NEW
                 downloadButton.disabled = false;
-                downloadAllButton.disabled = originalBackgroundImages.length === 0; // Enable new button
+                downloadAllButton.disabled = originalBackgroundImages.length === 0; 
                 zoomInButton.disabled = false;
                 zoomOutButton.disabled = false;
                 zoomResetButton.disabled = false;
@@ -498,8 +807,9 @@
                 undoButton.disabled = true;
                 clearButton.disabled = true;
                 toggleImageButton.disabled = true;
+                toggleNumbersButton.disabled = true; // NEW
                 downloadButton.disabled = true;
-                downloadAllButton.disabled = true; // Disable new button
+                downloadAllButton.disabled = true; 
                 zoomInButton.disabled = true;
                 zoomOutButton.disabled = true;
                 zoomResetButton.disabled = true;
@@ -526,13 +836,11 @@
                 });
             }
 
-            // Function to handle erasing dots
             function eraseDotsAtPosition(e) {
                 if (activeImageIndex === -1) return;
                 const activeDots = allDots[activeImageIndex];
                 const pos = getMousePos(e);
                 let dotsRemoved = false;
-
                 for (let i = activeDots.length - 1; i >= 0; i--) {
                     const dot = activeDots[i];
                     const distance = Math.sqrt(Math.pow(pos.x - dot.x, 2) + Math.pow(pos.y - dot.y, 2));
@@ -541,21 +849,17 @@
                         dotsRemoved = true;
                     }
                 }
-
                 if (dotsRemoved) {
                     renumberDots();
                     updateButtonStates();
                 }
             }
 
-            // Function to erase parts of the image content
             function eraseCanvasContentAtPosition(e) {
                 if (activeImageIndex === -1 || !currentBackgroundImages[activeImageIndex]) return;
-
                 const activeBg = currentBackgroundImages[activeImageIndex];
                 const pos = getMousePos(e);
                 const tempCtx = activeBg.getContext('2d');
-                
                 tempCtx.save();
                 tempCtx.beginPath();
                 tempCtx.arc(pos.x, pos.y, eraseImageRadius, 0, 2 * Math.PI);
@@ -564,27 +868,49 @@
                 tempCtx.restore();
             }
 
+            // --- Eyedropper Logic ---
+            function componentToHex(c) {
+              var hex = c.toString(16);
+              return hex.length == 1 ? "0" + hex : hex;
+            }
+            function rgbToHex(r, g, b) {
+              return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+            }
+            function pickColor(e) {
+                if (activeImageIndex === -1) return;
+                const pos = getMousePos(e);
+                // Get pixel data from the *displayed* canvas context
+                const p = ctx.getImageData(pos.x, pos.y, 1, 1).data;
+                const hex = rgbToHex(p[0], p[1], p[2]);
+                
+                // Set the color picker and state
+                lineColorPicker.value = hex;
+                lineColor = hex;
+                
+                // Switch back to 'add' tool automatically
+                document.getElementById('tool-add').checked = true;
+                currentTool = 'add';
+                canvas.style.cursor = 'crosshair';
+                canvasContainer.classList.remove('eyedropper-cursor');
+                eraserPreview.classList.add('hidden');
+            }
+            // --- End Eyedropper Logic ---
+
 
             // --- Event Listeners ---
-
-            // Image Loader
             imageLoader.addEventListener('change', (e) => {
                 const files = e.target.files;
                 if (!files || files.length === 0) {
                     disableControls();
                     return;
                 }
-                
                 originalBackgroundImages = new Array(files.length);
                 currentBackgroundImages = new Array(files.length);
-                allDots = new Array(files.length).fill(null).map(() => []); // Initialize with empty arrays
-                
+                allDots = new Array(files.length).fill(null).map(() => []); 
                 imageSelector.innerHTML = ''; 
                 placeholderText.classList.remove('hidden'); 
-                
                 let filesToLoad = files.length;
                 let loadedCount = 0;
-
                 Array.from(files).forEach((file, index) => {
                     const reader = new FileReader();
                     reader.onload = (event) => {
@@ -595,29 +921,25 @@
                             tempCanvas.height = image.height;
                             const tempCtx = tempCanvas.getContext('2d');
                             tempCtx.drawImage(image, 0, 0);
-                            
                             originalBackgroundImages[index] = image;
                             currentBackgroundImages[index] = tempCanvas;
-                            
                             imageSelector.add(new Option(file.name, index));
-                            
                             loadedCount++;
                             if (loadedCount === filesToLoad) {
                                 enableControls();
-                                switchToImage(0); // Switch to the first loaded image
+                                switchToImage(0); 
                             }
                         }
                         image.onerror = () => {
                             console.error(`Failed to load image: ${file.name}`);
                             loadedCount++;
                             if (loadedCount === filesToLoad) {
-                                // If some failed, still try to load first successful one
                                 const firstLoadedIndex = originalBackgroundImages.findIndex(img => img);
                                 if (firstLoadedIndex !== -1) {
                                     enableControls();
                                     switchToImage(firstLoadedIndex);
                                 } else {
-                                    disableControls(); // No images loaded successfully
+                                    disableControls(); 
                                 }
                             }
                         }
@@ -625,7 +947,7 @@
                     }
                     reader.onerror = () => {
                          console.error(`Failed to read file: ${file.name}`);
-                         loadedCount++; // Count as processed, even if failed
+                         loadedCount++; 
                          if (loadedCount === filesToLoad) {
                              const firstLoadedIndex = originalBackgroundImages.findIndex(img => img);
                              if (firstLoadedIndex !== -1) {
@@ -640,7 +962,6 @@
                 });
             });
 
-            // Image Selector
             imageSelector.addEventListener('change', (e) => {
                 const newIndex = parseInt(e.target.value, 10);
                 if (!isNaN(newIndex)) {
@@ -648,21 +969,22 @@
                 }
             });
 
-            // Tool Selection
             toolRadios.forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     currentTool = e.target.value;
-                    // Reset container cursors
-                    canvasContainer.classList.remove('pan-cursor', 'panning-cursor');
+                    canvasContainer.classList.remove('pan-cursor', 'panning-cursor', 'eyedropper-cursor');
                     canvas.classList.remove('eraser-cursor');
-                    canvas.style.cursor = 'crosshair'; // Default for add
-
+                    canvas.style.cursor = 'default'; // Reset
+                    
                     if (currentTool.startsWith('erase')) {
                         canvas.classList.add('eraser-cursor');
                         eraserPreview.classList.remove('hidden');
                     } else if (currentTool === 'pan') {
                         canvasContainer.classList.add('pan-cursor');
-                        canvas.style.cursor = 'default'; // No crosshair for pan
+                        eraserPreview.classList.add('hidden');
+                    } else if (currentTool === 'eyedropper') {
+                        canvasContainer.classList.add('eyedropper-cursor');
+                        canvas.style.cursor = 'crosshair';
                         eraserPreview.classList.add('hidden');
                     } else {
                         // 'add' tool
@@ -672,44 +994,40 @@
                 });
             });
 
-            // Canvas Click (for adding dots)
             canvas.addEventListener('click', (e) => {
-                if (activeImageIndex === -1 || currentTool !== 'add') return;
-                
-                const pos = getMousePos(e);
-                const activeDots = allDots[activeImageIndex];
+                if (activeImageIndex === -1) return;
 
-                let newX = pos.x;
-                let newY = pos.y;
-
-                if (dotSpacing > 0 && activeDots.length > 0) {
-                    const lastDot = activeDots[activeDots.length - 1];
-                    const dx = pos.x - lastDot.x;
-                    const dy = pos.y - lastDot.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance > 0) { // Avoid division by zero
-                        const normX = dx / distance;
-                        const normY = dy / distance;
-                        newX = lastDot.x + normX * dotSpacing;
-                        newY = lastDot.y + normY * dotSpacing;
-                    } else {
-                        return; // If click is on the last dot, do nothing
+                if (currentTool === 'add') {
+                    const pos = getMousePos(e);
+                    const activeDots = allDots[activeImageIndex];
+                    let newX = pos.x;
+                    let newY = pos.y;
+                    if (dotSpacing > 0 && activeDots.length > 0) {
+                        const lastDot = activeDots[activeDots.length - 1];
+                        const dx = pos.x - lastDot.x;
+                        const dy = pos.y - lastDot.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance > 0) { 
+                            const normX = dx / distance;
+                            const normY = dy / distance;
+                            newX = lastDot.x + normX * dotSpacing;
+                            newY = lastDot.y + normY * dotSpacing;
+                        } else {
+                            return; 
+                        }
                     }
+                    activeDots.push({ x: newX, y: newY, number: activeDots.length + 1 });
+                    updateButtonStates();
+                    draw();
+                } else if (currentTool === 'eyedropper') {
+                    pickColor(e);
                 }
-
-                activeDots.push({ x: newX, y: newY, number: activeDots.length + 1 });
-                updateButtonStates();
-                draw();
             });
 
-            // Canvas Mouse Events for Erasing (mousedown, mouseup, mousemove)
             canvas.addEventListener('mousedown', (e) => {
                 if (activeImageIndex === -1) return;
-                
-                // This event is only for drawing/erasing
                 if (currentTool.startsWith('erase')) {
-                    isDrawing = true; // Use isDrawing for continuous erase
+                    isDrawing = true; 
                     if (currentTool === 'erase-dots') {
                         eraseDotsAtPosition(e);
                     } else if (currentTool === 'erase-image') {
@@ -724,30 +1042,21 @@
             });
 
             canvas.addEventListener('mousemove', (e) => {
-                // This listener is only for eraser preview and drag-erasing
-                
-                // Update eraser preview position
                 if (currentTool.startsWith('erase') && activeImageIndex !== -1) {
                     const rect = canvasContainer.getBoundingClientRect(); 
                     const previewLeft = e.clientX - rect.left + canvasContainer.scrollLeft;
                     const previewTop = e.clientY - rect.top + canvasContainer.scrollTop;
-
-                    // NEW: Check which tool is active for radius
                     let currentEraserRadius = 0;
                     if (currentTool === 'erase-dots') {
                         currentEraserRadius = eraseDotsRadius;
                     } else if (currentTool === 'erase-image') {
                         currentEraserRadius = eraseImageRadius;
                     }
-                    
-                    // Use the correct radius and adjust position to be centered
                     eraserPreview.style.width = `${currentEraserRadius * 2}px`;
                     eraserPreview.style.height = `${currentEraserRadius * 2}px`;
                     eraserPreview.style.left = `${previewLeft - currentEraserRadius}px`;
                     eraserPreview.style.top = `${previewTop - currentEraserRadius}px`;
                 }
-
-                // Erase while dragging
                 if (isDrawing && currentTool.startsWith('erase')) {
                     if (currentTool === 'erase-dots') {
                         eraseDotsAtPosition(e);
@@ -762,7 +1071,7 @@
                 if (currentTool.startsWith('erase')) {
                     eraserPreview.classList.add('hidden');
                 }
-                isDrawing = false; // Stop drawing/erasing if mouse leaves canvas
+                isDrawing = false; 
             });
 
             canvas.addEventListener('mouseenter', (e) => {
@@ -771,7 +1080,6 @@
                 }
             });
 
-            // --- NEW: Pan Listeners on the CONTAINER ---
             canvasContainer.addEventListener('mousedown', (e) => {
                 if (currentTool === 'pan') {
                     e.preventDefault();
@@ -804,86 +1112,65 @@
                     e.preventDefault();
                     const dx = e.clientX - lastPanX;
                     const dy = e.clientY - lastPanY;
-                    
                     canvasContainer.scrollLeft -= dx;
                     canvasContainer.scrollTop -= dy;
-                    
                     lastPanX = e.clientX;
                     lastPanY = e.clientY;
                 }
             });
 
-
-            // Zoom Control Listeners
             zoomInButton.addEventListener('click', () => {
                 if (activeImageIndex === -1) return;
-                // Get center of viewport as fallback
                 const rect = canvasContainer.getBoundingClientRect();
                 const mouseX = rect.width / 2;
                 const mouseY = rect.height / 2;
-                zoomAtPoint(mouseX, mouseY, 1.25); // Zoom in by 25%
+                zoomAtPoint(mouseX, mouseY, 1.25); 
             });
 
             zoomOutButton.addEventListener('click', () => {
                 if (activeImageIndex === -1) return;
-                // Get center of viewport as fallback
                 const rect = canvasContainer.getBoundingClientRect();
                 const mouseX = rect.width / 2;
                 const mouseY = rect.height / 2;
-                zoomAtPoint(mouseX, mouseY, 0.8); // Zoom out by 20%
+                zoomAtPoint(mouseX, mouseY, 0.8); 
             });
 
             zoomResetButton.addEventListener('click', () => {
                 if (activeImageIndex === -1) return; 
                 zoomLevel = 1.0;
                 updateZoom();
-                // Reset scroll
                 canvasContainer.scrollLeft = 0;
                 canvasContainer.scrollTop = 0;
             });
 
-            // Consolidated Zoom Function
             function zoomAtPoint(mouseX, mouseY, zoomFactor) {
                 const oldScrollLeft = canvasContainer.scrollLeft;
                 const oldScrollTop = canvasContainer.scrollTop;
                 const oldZoom = zoomLevel;
-
                 let newZoom = oldZoom * zoomFactor;
-                newZoom = Math.max(minZoom, Math.min(maxZoom, newZoom)); // Clamp zoom
-                
-                if (newZoom === oldZoom) return; // No change
-
+                newZoom = Math.max(minZoom, Math.min(maxZoom, newZoom)); 
+                if (newZoom === oldZoom) return; 
                 const imageX = (oldScrollLeft + mouseX) / oldZoom;
                 const imageY = (oldScrollTop + mouseY) / oldZoom;
-
                 zoomLevel = newZoom;
-                updateZoom(); // This updates canvas display size
-
+                updateZoom(); 
                 const newScaledX = imageX * newZoom;
                 const newScaledY = imageY * newZoom;
-
                 canvasContainer.scrollLeft = newScaledX - mouseX;
                 canvasContainer.scrollTop = newScaledY - mouseY;
             }
 
             canvasContainer.addEventListener('wheel', (e) => {
                 if (activeImageIndex === -1) return;
-                
-                e.preventDefault(); // Prevent page scrolling
-
-                // --- NEW: Zoom-to-Cursor Logic ---
+                e.preventDefault(); 
                 const rect = canvasContainer.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left; // Mouse pos relative to container
+                const mouseX = e.clientX - rect.left; 
                 const mouseY = e.clientY - rect.top;
-                
-                const zoomFactor = e.deltaY < 0 ? 1.1 : 1 / 1.1; // 10% zoom in/out
+                const zoomFactor = e.deltaY < 0 ? 1.1 : 1 / 1.1; 
                 zoomAtPoint(mouseX, mouseY, zoomFactor);
-                // --- End of New Zoom Logic ---
-
             }, { passive: false });
 
 
-            // Slider Controls
             dotSizeSlider.addEventListener('input', (e) => {
                 dotSize = parseInt(e.target.value, 10);
                 dotSizeValue.textContent = dotSize;
@@ -899,7 +1186,6 @@
                 fontSizeValue.textContent = fontSize;
                 draw();
             });
-            
             eraseDotsRadiusSlider.addEventListener('input', (e) => {
                 eraseDotsRadius = parseInt(e.target.value, 10);
                 eraseDotsRadiusValue.textContent = eraseDotsRadius;
@@ -908,7 +1194,6 @@
                     eraserPreview.style.height = `${eraseDotsRadius * 2}px`;
                 }
             });
-            
             eraseImageRadiusSlider.addEventListener('input', (e) => {
                 eraseImageRadius = parseInt(e.target.value, 10);
                 eraseImageRadiusValue.textContent = eraseImageRadius;
@@ -921,8 +1206,6 @@
                 dotSpacing = parseInt(e.target.value, 10);
                 spacingValue.textContent = dotSpacing;
             });
-
-            // Color Pickers
             dotColorPicker.addEventListener('input', (e) => {
                 dotColor = e.target.value;
                 draw();
@@ -932,7 +1215,6 @@
                 draw();
             });
 
-            // Action Buttons
             undoButton.addEventListener('click', () => {
                 if (activeImageIndex === -1) return;
                 const activeDots = allDots[activeImageIndex];
@@ -951,43 +1233,30 @@
                 confirmModal.classList.remove('hidden');
             });
 
-            // Modal button listeners
             modalCancel.addEventListener('click', () => {
                 confirmModal.classList.add('hidden');
             });
 
             modalConfirm.addEventListener('click', () => {
                 if (activeImageIndex === -1) return;
-
-                // Clear dots for active image
                 allDots[activeImageIndex] = [];
-                
-                // Reset active background image canvas
                 const originalImg = originalBackgroundImages[activeImageIndex];
                 const activeBgCanvas = currentBackgroundImages[activeImageIndex];
-                
                 if (originalImg && activeBgCanvas) {
                     const tempCtx = activeBgCanvas.getContext('2d');
                     tempCtx.clearRect(0, 0, activeBgCanvas.width, activeBgCanvas.height);
                     tempCtx.drawImage(originalImg, 0, 0);
                 }
-                
-                // Reset zoom
                 zoomLevel = 1.0;
                 updateZoom();
-
                 updateButtonStates();
                 draw();
-
                 confirmModal.classList.add('hidden');
             });
             
-            // NEW: Add Ctrl+Z (or Cmd+Z) for Undo
             document.addEventListener('keydown', (e) => {
-                // Check for Ctrl+Z or Cmd+Z
                 if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                    e.preventDefault(); // Prevent browser's default undo
-                    // Trigger the undo button's click event, if it's not disabled
+                    e.preventDefault(); 
                     if (!undoButton.disabled) {
                         undoButton.click();
                     }
@@ -1001,148 +1270,113 @@
                 draw();
             });
 
-            downloadButton.addEventListener('click', () => {
+            // Toggle Numbers Button Listener
+            toggleNumbersButton.addEventListener('click', () => {
                 if (activeImageIndex === -1) return;
+                showNumbers = !showNumbers;
+                toggleNumbersButton.textContent = showNumbers ? 'Hide Numbers' : 'Show Numbers';
+                draw();
+            });
 
-                const activeBg = currentBackgroundImages[activeImageIndex];
-                const activeDots = allDots[activeImageIndex];
-                const originalImg = originalBackgroundImages[activeImageIndex];
+            // Re-usable download logic
+            function createDownloadCanvas(index, currentSettings) {
+                const activeBg = currentBackgroundImages[index];
+                const activeDots = allDots[index];
+                const originalImg = originalBackgroundImages[index];
+                if (!originalImg) return null;
 
-                if (!originalImg) return; // Safety check
+                const { lineW, dotS, fontS, dotC, lineC, showNum } = currentSettings;
 
-                // --- FINAL FIX: Read values DIRECTLY from controls at download time ---
-                const currentLineWidth = parseInt(lineWidthSlider.value, 10);
-                const currentDotSize = parseInt(dotSizeSlider.value, 10);
-                const currentFontSize = parseInt(fontSizeSlider.value, 10);
-                const currentDotColor = dotColorPicker.value;
-                const currentLineColor = lineColorPicker.value;
-                // --- End of Fix ---
-
-                // 1. Create a new canvas in memory
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = originalImg.width;
                 tempCanvas.height = originalImg.height;
                 const tempCtx = tempCanvas.getContext('2d');
-
-                // 2. Fill background with white (as requested by user for "blank")
                 tempCtx.fillStyle = '#FFFFFF';
                 tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-                // 3. Redraw everything onto this new canvas
                 if (showImage && activeBg) {
                     tempCtx.drawImage(activeBg, 0, 0);
                 }
-
-                // 4. Draw lines (using the LOCAL variable)
-                if (currentLineWidth > 0 && activeDots.length > 1) {
+                if (lineW > 0 && activeDots.length > 1) {
                     tempCtx.beginPath();
                     tempCtx.moveTo(activeDots[0].x, activeDots[0].y);
                     for (let i = 1; i < activeDots.length; i++) {
                         tempCtx.lineTo(activeDots[i].x, activeDots[i].y);
                     }
-                    tempCtx.strokeStyle = currentLineColor;
-                    tempCtx.lineWidth = currentLineWidth; // Uses LOCAL variable
+                    tempCtx.strokeStyle = lineC;
+                    tempCtx.lineWidth = lineW; 
                     tempCtx.stroke();
                 }
 
-                // 5. Draw dots and numbers (using LOCAL variables)
-                tempCtx.font = `${currentFontSize}px Arial`;
-                // tempCtx.textAlign = 'center'; // No longer default center
-                tempCtx.textBaseline = 'middle';
+                if (showNum) {
+                    tempCtx.font = `${fontS}px Arial`;
+                    tempCtx.textBaseline = 'middle';
+                    activeDots.forEach(dot => {
+                        tempCtx.beginPath();
+                        tempCtx.arc(dot.x, dot.y, dotS, 0, 2 * Math.PI);
+                        tempCtx.fillStyle = '#FFFFFF';
+                        tempCtx.fill();
+                        tempCtx.strokeStyle = dotC;
+                        tempCtx.lineWidth = 1;
+                        tempCtx.stroke();
+                        tempCtx.fillStyle = dotC;
+                        tempCtx.textAlign = 'right'; 
+                        tempCtx.fillText(dot.number, dot.x - dotS - 5, dot.y); 
+                    });
+                } else {
+                    activeDots.forEach(dot => {
+                        tempCtx.beginPath();
+                        tempCtx.arc(dot.x, dot.y, dotS, 0, 2 * Math.PI);
+                        tempCtx.fillStyle = '#FFFFFF';
+                        tempCtx.fill();
+                        tempCtx.strokeStyle = dotC;
+                        tempCtx.lineWidth = 1;
+                        tempCtx.stroke();
+                    });
+                }
+                return tempCanvas;
+            }
 
-                activeDots.forEach(dot => {
-                    // Draw dot
-                    tempCtx.beginPath();
-                    tempCtx.arc(dot.x, dot.y, currentDotSize, 0, 2 * Math.PI);
-                    tempCtx.fillStyle = '#FFFFFF';
-                    tempCtx.fill();
-                    tempCtx.strokeStyle = currentDotColor;
-                    tempCtx.lineWidth = 1;
-                    tempCtx.stroke();
-
-                    // Draw number
-                    tempCtx.fillStyle = currentDotColor;
-                    tempCtx.textAlign = 'right'; // Align text to the right
-                    // Offset number to the left of the dot
-                    ctx.fillText(dot.number, dot.x - currentDotSize - 5, dot.y); // 5px gap
-                });
-
-
+            downloadButton.addEventListener('click', () => {
+                if (activeImageIndex === -1) return;
+                
+                // Get all current settings
+                const currentSettings = {
+                    lineW: parseInt(lineWidthSlider.value, 10),
+                    dotS: parseInt(dotSizeSlider.value, 10),
+                    fontS: parseInt(fontSizeSlider.value, 10),
+                    dotC: dotColorPicker.value,
+                    lineC: lineColorPicker.value,
+                    showNum: showNumbers
+                };
+                
+                const tempCanvas = createDownloadCanvas(activeImageIndex, currentSettings);
+                if (!tempCanvas) return;
+                
                 const link = document.createElement('a');
-                // Use original file name if possible, otherwise index
                 const fileName = imageSelector.options[activeImageIndex] ? imageSelector.options[activeImageIndex].text : `image-${activeImageIndex + 1}`;
                 const baseName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
                 link.download = `dot-to-dot-${baseName}.png`;
-                // 6. Generate the data URL from the NEW temporary canvas
                 link.href = tempCanvas.toDataURL('image/png');
                 link.click();
             });
             
-            // NEW Event Listener for "Download All"
             downloadAllButton.addEventListener('click', () => {
                 if (originalBackgroundImages.length === 0) return;
 
-                // --- Read values DIRECTLY from controls at download time ---
-                const currentLineWidth = parseInt(lineWidthSlider.value, 10);
-                const currentDotSize = parseInt(dotSizeSlider.value, 10);
-                const currentFontSize = parseInt(fontSizeSlider.value, 10);
-                const currentDotColor = dotColorPicker.value;
-                const currentLineColor = lineColorPicker.value;
+                // Get all current settings once
+                const currentSettings = {
+                    lineW: parseInt(lineWidthSlider.value, 10),
+                    dotS: parseInt(dotSizeSlider.value, 10),
+                    fontS: parseInt(fontSizeSlider.value, 10),
+                    dotC: dotColorPicker.value,
+                    lineC: lineColorPicker.value,
+                    showNum: showNumbers
+                };
 
-                // Loop through every loaded image
                 for (let i = 0; i < originalBackgroundImages.length; i++) {
-                    const activeBg = currentBackgroundImages[i];
-                    const activeDots = allDots[i];
-                    const originalImg = originalBackgroundImages[i];
+                    const tempCanvas = createDownloadCanvas(i, currentSettings);
+                    if (!tempCanvas) continue;
 
-                    if (!originalImg) continue; // Skip if this image failed to load
-
-                    // 1. Create a new canvas in memory
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = originalImg.width;
-                    tempCanvas.height = originalImg.height;
-                    const tempCtx = tempCanvas.getContext('2d');
-
-                    // 2. Fill background with white
-                    tempCtx.fillStyle = '#FFFFFF';
-                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-                    // 3. Redraw background (respecting the toggle)
-                    if (showImage && activeBg) {
-                        tempCtx.drawImage(activeBg, 0, 0);
-                    }
-
-                    // 4. Draw lines
-                    if (currentLineWidth > 0 && activeDots.length > 1) {
-                        tempCtx.beginPath();
-                        tempCtx.moveTo(activeDots[0].x, activeDots[0].y);
-                        for (let j = 1; j < activeDots.length; j++) {
-                            tempCtx.lineTo(activeDots[j].x, activeDots[j].y);
-                        }
-                        tempCtx.strokeStyle = currentLineColor;
-                        tempCtx.lineWidth = currentLineWidth;
-                        tempCtx.stroke();
-                    }
-
-                    // 5. Draw dots and numbers
-                    tempCtx.font = `${currentFontSize}px Arial`;
-                    tempCtx.textBaseline = 'middle';
-
-                    activeDots.forEach(dot => {
-                        tempCtx.beginPath();
-                        tempCtx.arc(dot.x, dot.y, currentDotSize, 0, 2 * Math.PI);
-                        tempCtx.fillStyle = '#FFFFFF';
-                        tempCtx.fill();
-                        tempCtx.strokeStyle = currentDotColor;
-                        tempCtx.lineWidth = 1;
-                        tempCtx.stroke();
-
-                        tempCtx.fillStyle = currentDotColor;
-                        tempCtx.textAlign = 'right';
-                        tempCtx.fillText(dot.number, dot.x - currentDotSize - 5, dot.y);
-                    });
-
-                    // 6. Create link and trigger download
                     const link = document.createElement('a');
                     const fileName = imageSelector.options[i] ? imageSelector.options[i].text : `image-${i + 1}`;
                     const baseName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
